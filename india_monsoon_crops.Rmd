@@ -1,0 +1,61 @@
+---
+title: "india_monsoon_crops"
+author: "Anastacia Wienecke"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+``` {r fig.height = 10, fig.width = 10}
+#install.packages('dplyr')
+#install.packages('ggplot2')
+library(dplyr)
+library(ggplot2)
+rains <- read.csv("data/india_rains.csv") %>% 
+         select(-Name,-Jan.Feb,-Mar.May,-June.September,-Oct.Dec)
+
+
+
+# Basic barplots of annual rainfall for 1901, 1925, 1950, 1975, 2000, and 2017
+rains.per25years <- rains %>% filter(YEAR %in% c(1901,1925,1950,1975,2000,2017))
+ggplot(data=rains.per25years, aes(x=SUBDIVISION, y=ANNUAL)) +
+    geom_bar(stat="identity") +
+     scale_x_discrete(guide = guide_axis(angle = 90)) +
+     facet_grid(YEAR ~ ., scales = "free_y") +
+     coord_cartesian(ylim = c(0, 4500))
+
+# Trends of annual rainfall between 1901-2017 for all 36 regions
+ggplot(data=rains.per25years, aes(x=YEAR, y=ANNUAL, group=SUBDIVISION, color=SUBDIVISION)) +
+       geom_line()
+
+# Plot of median rainfall vs. variability in rainfall
+meds <- rains %>%
+        group_by(SUBDIVISION) %>%
+        summarise_at(vars(ANNUAL), list(median=median, variance=var))
+meds$stdev <- sqrt(meds$variance)
+meds$stdev.norm <- meds$stdev / meds$median
+
+# non-normalized
+ggplot(data=meds, aes(x=median, y=stdev.norm)) +
+       geom_line() +
+       geom_point()
+
+# normalized
+ggplot(data=meds, aes(x=median, y=stdev.norm)) +
+       geom_line() +
+       geom_point()
+
+
+
+
+
+#ggsave(g, height = 14, width = 7)
+#unique(rains$SUBDIVISION)
+#unique(rains$YEAR)
+#crops <- read.csv("data/india_crops.csv")
+
+
+
+```
+
+
+
