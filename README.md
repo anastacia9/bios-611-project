@@ -4,12 +4,9 @@
 India is an agrarian country – just over half of its working population is involved in agriculture, and 
 nearly a fifth of the country’s GDP comes from this sector [1,2]. With climate change, the yearly 
 monsoon rains, which the agricultural industry is so dependent upon, have intensified, shortened, and 
-become more sporadic [3]. This study will investigate how the agricultural industry has responded to 
-this change. These results will shed light on the future of India’s crop output, help determine which 
-states and territories have been hardest hit, and inform decisions on environmental policy.
+become more sporadic [3]. This study will investigate changes in rainfall between the years 1901 and 2017. It will make use of monthly measurements spanning all 36 Indian States and Territories.
 
 Data was downloaded from kaggle.com:<br />
-  https://www.kaggle.com/datasets/abhinand05/crop-production-in-india<br />
   https://www.kaggle.com/datasets/rajanand/rainfall-in-india<br />
 
 References: <br />
@@ -25,7 +22,7 @@ much. The New York Times. Retrieved August 21, 2022. <br />
 
 # Getting Started
 
-Build the docker image by typing:
+"cd" into the project directory and build the docker image by typing:
 ```
 docker build . -t anastacia611
 ```
@@ -34,11 +31,22 @@ And then start an RStudio by typing:
 ```
 docker run -v $(pwd):/home/rstudio/project -p 8787:8787 -e PASSWORD=begin!
 ```
-
+Or if you are a Windows user in the Command Prompt, type:
+```
+docker run -v %cd%:/home/rstudio/work -e PASSWORD=work -p 8787:8787 -it anastacia611
+```
 Once the Rstudio is running connect to it by visiting
-https://localhost:8787 in your browser. The username is "rstudio" and the password "begin!"
+localhost:8787 in your browser. The username is "rstudio" and the password "work"
 
-To build the final report, visit the terminal in RStudio and type
+Everything happens in "work" directory, so type the following into the Console:
 ```
-make report.pdf
+setwd("/home/rstudio/work")
 ```
+
+Visit the terminal in Rstudio and type:
+```
+make clean
+make
+```
+
+The outcome will be a .pdf file with figures, as well as a figure directory with the same figures.
