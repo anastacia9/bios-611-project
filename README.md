@@ -2,9 +2,8 @@
 
 # Background
 India is an agrarian country – just over half of its working population is involved in agriculture, and 
-nearly a fifth of the country’s GDP comes from this sector [1,2]. With climate change, the yearly 
-monsoon rains, which the agricultural industry is so dependent upon, have intensified, shortened, and 
-become more sporadic [3]. This study will investigate changes in rainfall between the years 1901 and 2017. It will make use of monthly measurements spanning all 36 Indian States and Territories.
+nearly a fifth of the country’s GDP comes from this sector [1,2]. The agricultural industry depends on the yearly 
+monsoon rains which have intensified, shortened, and become more sporadic [3]. This study will investigate changes in rainfall between the years 1901 and 2017. It will make use of monthly measurements spanning all 36 Indian States and Territories.
 
 Data was downloaded from kaggle.com:<br />
   https://www.kaggle.com/datasets/rajanand/rainfall-in-india<br />
@@ -21,7 +20,7 @@ agrarian-revolution <br />
 much. The New York Times. Retrieved August 21, 2022. <br />
 
 # Warning
-I tried my best, but for whatever reason, I have difficulty installing certain packages in the Rstudio server. These include "terra" and "mapview". I pasted the error message below. I think the issue is with this line: "configure: error: gdal-config not found or not executable." The pdf knits just fine on my local machine, but on the Rstudio server, I can't get passed this point. I will ask about it in class on Monday. I'm very close. I have left the "india.pdf" report in my git repository for now. But the make file is there to make it once I get this problem resolved.
+I tried my best, but for whatever reason, I have difficulty installing certain packages in the Rstudio server. These include "terra" and "mapview". I pasted the error message below. I think the issue is with this line: "configure: error: gdal-config not found or not executable." I tried to figure out how to fix this, but it's still not clear. The pdf knits just fine on my local machine, but on the Rstudio server, I can't get passed this point. I will ask about it in class on Monday. I'm very close. I have left the "india.pdf" report in my git repository for now, but the make file is there to make all the files once I get this problem resolved.
 
 ```
 > install.packages("terra")
