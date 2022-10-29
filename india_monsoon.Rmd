@@ -11,13 +11,15 @@ Install and load packages:
 r = getOption("repos")
 r["CRAN"] = "http://cran.us.r-project.org"
 options(repos = r)
+install.packages("terra")
 install.packages('dplyr')
 install.packages('ggplot2')
 install.packages('mapview')
 install.packages('htmlwidgets')
 install.packages('viridis')
 install.packages('tidyr')
-library(dplyr)
+library(terra)
+library(tidyverse)
 library(ggplot2)
 library(mapview)
 library(htmlwidgets)
@@ -42,7 +44,8 @@ meds.order <- meds$SUBDIVISION[order(meds$median, decreasing = TRUE)]
 
 ```{r fig.height = 10, fig.width = 10}
 ### Plot sampling locations on map, color by median annual rainfall
-### At the top left, click the layers button below the zoom function. Select "Esri.WorldImagery" to see the satellite view.
+### At the top left, click the layers button below the zoom function.
+### Select "Esri.WorldImagery" to see the satellite view.
 latlong <- rains %>%
            select(SUBDIVISION, Latitude, Longitude) %>%
            distinct() %>%
@@ -53,7 +56,8 @@ maxmed <- meds$median %>% max() %>% ceiling() + 300
 breaks <- seq(from=minmed, to=maxmed, by=300)
 ranges <- length(breaks)
 colors <- rainbow(n = ranges)
-india  <- mapview(latlong, xcol = "Longitude", ycol = "Latitude", crs = 4269, grid = FALSE, zcol="median", col.regions = colors, at = breaks)
+india  <- mapview(latlong, xcol = "Longitude", ycol = "Latitude", crs = 4269,
+                  grid = FALSE, zcol="median", col.regions = colors, at = breaks)
 india
 mapshot(india, file = "figures/india.png")
 saveWidget(india@map, file="figures/india.html")
@@ -73,26 +77,31 @@ latlong$colorful <- shades
 years <- c(1901,1925,1950,1975,2000,2017)
 rains.per25years <- rains %>%
                     filter(YEAR %in% years) %>%
-                    merge(latlong[c('SUBDIVISION', 'colorful')], by=c("SUBDIVISION"))
+                    merge(latlong[c('SUBDIVISION', 'colorful')], 
+                          by=c("SUBDIVISION"))
 meds.factor <- factor(rains.per25years$SUBDIVISION, levels=meds.order)
 rains.per25years <- rains.per25years[order(meds.factor),]
-rains.per25years$SUBDIVISION <- factor(rains.per25years$SUBDIVISION, levels = meds.order)
+rains.per25years$SUBDIVISION <- factor(rains.per25years$SUBDIVISION,
+                                       levels = meds.order)
 
-bars <- ggplot(data=rains.per25years, aes(x=SUBDIVISION, y=ANNUAL, fill=colorful)) +
+bars <- ggplot(data=rains.per25years, aes(x=SUBDIVISION, y=ANNUAL,
+                                          fill=colorful)) +
                geom_bar(stat="identity", show.legend = FALSE) +
                scale_x_discrete(guide = guide_axis(angle = 90)) +
                facet_grid(YEAR ~ ., scales = "free_y") +
                coord_cartesian(ylim = c(0, 4500)) +
                labs(x = "State",
                     y = "Median Rainfall",
-                title = "Barplot of annual rainfall for years 1901, 1925, 1950, 1975, 2000, and 2017")
+                title = "Barplot of annual rainfall for years 1901, 1925, 1950,
+                1975, 2000, and 2017")
 bars
 ggsave("figures/quarter_centuray_rainfall.png", bars)
 ```
 
 ``` {r echo=FALSE}
 ### Median monthly rainfall for each state
-rains.col <- merge(rains, latlong[c('SUBDIVISION', 'colorful')], by=c("SUBDIVISION"))
+rains.col <- merge(rains, latlong[c('SUBDIVISION', 'colorful')],
+                   by=c("SUBDIVISION"))
 indexs <- c(1,2,3,4,5,8,9,11)
 graphs <- list()
 count  <- 1
@@ -108,15 +117,20 @@ rains.info <- rains.col %>%
                            list(median=median,
                                 Q1=~quantile(., probs = 0.25),
                                 Q3=~quantile(., probs = 0.75)))
-rains.info$month <- factor(rains.info$month, levels = c("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"))
+rains.info$month <- factor(rains.info$month, levels = c("JAN", "FEB", "MAR",
+                                                        "APR", "MAY", "JUN",
+                                                        "JUL", "AUG", "SEP",
+                                                        "OCT", "NOV", "DEC"))
 
-graphs[[count]] <- ggplot(rains.info, aes(month, median, color=SUBDIVISION, group=SUBDIVISION)) +
+graphs[[count]] <- ggplot(rains.info, aes(month, median, color=SUBDIVISION,
+                                          group=SUBDIVISION)) +
                           geom_point() +
                           geom_line() +
                           #geom_errorbar(aes(ymin = Q1, ymax = Q3)) +
                           labs(x = "month",
                                y = "median rainfall between 1901 and 2017")
-ggsave( paste('figures/median_monthly_rainfall_lineplot',as.character(count),'.png', sep=''), graphs[[count]] )
+ggsave(paste('figures/median_monthly_rainfall_lineplot',as.character(count),'.png',
+             sep=''), graphs[[count]] )
 count <- count + 1 
 }
 graphs
@@ -130,7 +144,8 @@ nnorms <- ggplot(data=meds, aes(x=median, y=stdev)) +
                  geom_point() +
                  labs(x = "Median Annual Rainfall",
                       y = "Standard Deviation in Annual Rainfall",
-                  title = "Line plot of median annual rainfall vs. the standard deviation in annual rainfall")
+                  title = "Line plot of median annual rainfall vs. the standard
+                  deviation in annual rainfall")
 ggsave("figures/lineplot_median_stdev_rainfall.png", nnorms)
 nnorms
 
@@ -140,7 +155,9 @@ norms <- ggplot(data=meds, aes(x=median, y=stdev.norm)) +
                 geom_point() +
                 labs(x = "Median Annual Rainfall",
                      y = "Scaled Standard Deviation in Annual Rainfall",
-                 title = "Line plot of median annual rainfall vs. the scaled standard deviation in annual rainfall\n(standard deviation divided by median)")
+                 title = "Line plot of median annual rainfall vs. the scaled
+                 standard deviation in annual rainfall\n(standard deviation
+                 divided by median)")
 ggsave("figures/lineplot_median_norm_stdev_rainfall.png", norms)
 norms
 ```
