@@ -8,16 +8,6 @@ output: pdf_document
 Install and load packages:
 
 ```{r include=FALSE}
-r = getOption("repos")
-r["CRAN"] = "http://cran.us.r-project.org"
-options(repos = r)
-install.packages("terra")
-install.packages('dplyr')
-install.packages('ggplot2')
-install.packages('mapview')
-install.packages('htmlwidgets')
-install.packages('viridis')
-install.packages('tidyr')
 library(terra)
 library(tidyverse)
 library(ggplot2)
