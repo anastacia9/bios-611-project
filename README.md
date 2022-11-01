@@ -19,36 +19,6 @@ agrarian-revolution <br />
 [3] Denton, B., &; Sengupta, S. (2019, November 25). India's ominous future: Too little water, or far too 
 much. The New York Times. Retrieved August 21, 2022. <br />
 
-# Warning
-I tried my best, but for whatever reason, I have difficulty installing certain packages in the Rstudio server. These include "terra" and "mapview". I pasted the error message below. I think the issue is with this line: "configure: error: gdal-config not found or not executable." I tried to figure out how to fix this, but it's still not clear. The pdf knits just fine on my local machine, but on the Rstudio server, I can't get passed this point. I will ask about it in class on Monday. I'm very close. I have left the "india.pdf" report in my git repository for now, but the make file is there to make all the files once I get this problem resolved.
-
-```
-> install.packages("terra")
-Installing package into ‘/usr/local/lib/R/site-library’
-(as ‘lib’ is unspecified)
-trying URL 'http://cran.us.r-project.org/src/contrib/terra_1.6-17.tar.gz'
-Content type 'application/x-gzip' length 698382 bytes (682 KB)
-==================================================
-downloaded 682 KB
-
-* installing *source* package ‘terra’ ...
-** package ‘terra’ successfully unpacked and MD5 sums checked
-** using staged installation
-configure: CC: gcc
-configure: CXX: g++ -std=gnu++11
-checking for gdal-config... no
-no
-configure: error: gdal-config not found or not executable.
-ERROR: configuration failed for package ‘terra’
-* removing ‘/usr/local/lib/R/site-library/terra’
-* restoring previous ‘/usr/local/lib/R/site-library/terra’
-Warning in install.packages :
-  installation of package ‘terra’ had non-zero exit status
-
-The downloaded source packages are in
-	‘/tmp/Rtmp1RvN84/downloaded_packages’
-```
-
 # Getting Started
 
 Download this repository and "cd" into it. Build the docker image by typing:
@@ -58,7 +28,7 @@ docker build . -t anastacia611
 
 Start RStudio by typing:
 ```
-docker run -v $(pwd):/home/rstudio/project -p 8787:8787 -e PASSWORD=begin!
+docker run -v $(pwd):/home/rstudio/project -p 8787:8787 -e PASSWORD=work
 ```
 Or if you are a Windows user in the Command Prompt, type:
 ```
