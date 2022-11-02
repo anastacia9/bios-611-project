@@ -28,11 +28,10 @@ docker build . -t anastacia611
 
 Start RStudio by typing:
 ```
-docker run -v $(pwd):/home/rstudio/project -p 8787:8787 -e PASSWORD=work
-```
-Or if you are a Windows user in the Command Prompt, type:
-```
-docker run -v %cd%:/home/rstudio/work -e PASSWORD=work -p 8787:8787 -it anastacia611
+# for apple users:
+docker run -v $(pwd):/home/rstudio/work -e PASSWORD=work -p 8787:8787 -it anastacia611
+# for windows users:
+docker run -v   %cd%:/home/rstudio/work -e PASSWORD=work -p 8787:8787 -it anastacia611
 ```
 
 Once Rstudio is running, connect to it by visiting
