@@ -3,6 +3,7 @@ title: "india_monsoon"
 author: "Anastacia Wienecke"
 date: "`r Sys.Date()`"
 output: pdf_document
+always_allow_html: true
 ---
 
 Install and load packages:
@@ -85,7 +86,7 @@ bars <- ggplot(data=rains.per25years, aes(x=SUBDIVISION, y=ANNUAL,
                 title = "Barplot of annual rainfall for years 1901, 1925, 1950,
                 1975, 2000, and 2017")
 bars
-ggsave("figures/quarter_centuray_rainfall.png", bars)
+ggsave("figures/quarter_century_rainfall.png", bars)
 ```
 
 ``` {r echo=FALSE}

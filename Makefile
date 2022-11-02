@@ -3,12 +3,12 @@
 clean:
 	rm -rf figures
 	rm -rf .created-dirs
-	rm -f writeup.pdf
+	rm -f india_monsoon.pdf
 
 .created-dirs:
 	mkdir -p figures
 	touch .created-dirs
-india.pdf \
+india_monsoon.pdf \
  figures/india.png \
  figures/india.html \
  figures/median_monthly_rainfall_lineplot1.png \
