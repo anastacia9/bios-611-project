@@ -9,6 +9,7 @@ always_allow_html: true
 Install and load packages:
 
 ```{r include=FALSE}
+library(webshot)
 library(terra)
 library(tidyverse)
 library(ggplot2)
