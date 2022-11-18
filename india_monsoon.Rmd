@@ -55,6 +55,8 @@ mapshot(india, file = "figures/india.png")
 saveWidget(india@map, file="figures/india.html")
 ```
 
+
+You could turn this into a boxplot too?
 ``` {r fig.height = 10, fig.width = 10, echo=FALSE}
 ### Assign colors to dataframe
 entrys <- latlong$SUBDIVISION %>% length()
@@ -136,8 +138,7 @@ nnorms <- ggplot(data=meds, aes(x=median, y=stdev)) +
                  geom_point() +
                  labs(x = "Median Annual Rainfall",
                       y = "Standard Deviation in Annual Rainfall",
-                  title = "Line plot of median annual rainfall vs. the standard
-                  deviation in annual rainfall")
+                  title = "Line plot of median annual rainfall vs. the standard deviation in annual rainfall")
 ggsave("figures/lineplot_median_stdev_rainfall.png", nnorms)
 nnorms
 
@@ -147,9 +148,156 @@ norms <- ggplot(data=meds, aes(x=median, y=stdev.norm)) +
                 geom_point() +
                 labs(x = "Median Annual Rainfall",
                      y = "Scaled Standard Deviation in Annual Rainfall",
-                 title = "Line plot of median annual rainfall vs. the scaled
-                 standard deviation in annual rainfall\n(standard deviation
-                 divided by median)")
+                 title = "Line plot of median annual rainfall vs. the scaled standard deviation in annual rainfall\n(standard deviation divided by median)")
 ggsave("figures/lineplot_median_norm_stdev_rainfall.png", norms)
 norms
 ```
+
+Ideas:
+- yearly average rainfall
+- annual rainfall boxplot per subdivision over time
+- with the crops data, try a PCA with crop production of each state in a single year; how much does this change yearly within a 10-year period (or between another set of years). Will need to normalize by total crop production by that state; which states form clusters? is this related to rainfall?
+
+
+``` {r}
+### Read in crops data (annual per Indian state from 1901-2017)
+crops <- read.csv("data/india_crops.csv")
+
+### Standardize state labels between crops data and rains data
+crops.state <- unique(crops$State_Name) # these state names are most accurate according to "knowindia.india.gov.in"
+rains.state <- unique(rains$SUBDIVISION)
+
+crops <- crops %>%
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Assam"|State_Name=='Meghalaya',
+                                     "Assam and Meghalaya")) %>%
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Chandigarh"|State_Name=='Haryana',
+                                     "Chandigarh and Haryana")) %>%  
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Goa"|State_Name=='Maharashtra',
+                                     "Goa and Maharashtra")) %>%
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Manipur"|State_Name=='Mizoram'|
+                                     State_Name=='Nagaland'|State_Name=='Tripura',
+                                     "Nagaland, Manipur, Mizoram, Tripura")) %>% 
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Sikkim"|State_Name=='West Bengal',
+                                     "Sikkim and West Bengal")) %>%
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Jammu and Kashmir ",
+                                     "Jammu and Kashmir")) %>%  
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Telangana ",
+                                     "Telangana")) %>%  
+         filter(!State_Name %in% c('Dadra and Nagar Haveli','Puducherry')) %>%
+         select(State_Name, Crop_Year, Crop, Area, Production)
+
+rains <- rains %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Andaman & Nicobar Islands",
+                                     "Andaman and Nicobar Islands")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Coastal Andhra Pradesh"|
+                                      SUBDIVISION=="Rayalseema",
+                                     "Andhra Pradesh")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Assam & Meghalaya",
+                                      "Assam and Meghalaya")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Haryana Delhi & Chandigarh",
+                                      "Chandigarh and Haryana")) %>%  
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Konkan & Goa"|
+                                      SUBDIVISION=="Madhya Maharashtra"|
+                                      SUBDIVISION=="Vidarbha"|
+                                      SUBDIVISION=="Matathwada",
+                                      "Goa and Maharashtra")) %>%  
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Gujarat Region"|
+                                      SUBDIVISION=="Saurashtra & Kutch",
+                                      "Gujarat")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Jammu & Kashmir",
+                                      "Jammu and Kashmir")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Coastal Karnataka"|
+                                      SUBDIVISION=="North Interior Karnataka"|
+                                      SUBDIVISION=="South Interior Karnataka",
+                                      "Karnataka")) %>% 
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="West Madhya Pradesh"|
+                                      SUBDIVISION=="East Madhya Pradesh",
+                                      "Madhya Pradesh")) %>% 
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Naga Mani Mizo Tripura",
+                                      "Nagaland, Manipur, Mizoram, Tripura")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Orissa",
+                                      "Odisha")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="West Rajasthan"|
+                                      SUBDIVISION=="East Rajasthan",
+                                      "Rajasthan")) %>% 
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Sub Himalayan West Bengal & Sikkim"|
+                                      SUBDIVISION=="Gangetic West Bengal",
+                                      "Sikkim and West Bengal")) %>% 
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Sub Himalayan West Bengal & Sikkim"|
+                                      SUBDIVISION=="Gangetic West Bengal",
+                                      "Sikkim and West Bengal")) %>% 
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="East Uttar Pradesh"|
+                                      SUBDIVISION=="West Uttar Pradesh",
+                                      "Uttar Pradesh")) %>% 
+         filter(!SUBDIVISION %in% c('Lakshadweep'))
+```
+
+``` {r}
+### Which crops appear most frequently in this dataset?
+crop.counts <- rev(stack(table(crops$Crop)))
+crop.counts <- crop.counts[order(crop.counts$values, decreasing=T),]
+head(crop.counts)
+
+### Get total crop area and production for each state per year
+crops.tot.area <- crops %>% group_by(State_Name, Crop_Year, Crop) %>% summarise(Area = sum(Area))
+crops.tot.prod <- crops %>% group_by(State_Name, Crop_Year, Crop) %>% summarise(Production = sum(Production))
+crops.tot.area.wide <- crops.tot.area %>% 
+                       pivot_wider(names_from = Crop, values_from = Area) %>%
+                       replace(is.na(.), 0)
+crops.tot.prod.wide <- crops.tot.prod %>% 
+                       pivot_wider(names_from = Crop, values_from = Production) %>%
+                       replace(is.na(.), 0)
+
+### Combine crops that appear less than 500 times as "other"
+other <- crop.counts$ind[crop.counts$values<500]
+crops.tot.area.wide$other <- rowSums(crops.tot.area.wide[,other])
+crops.tot.prod.wide$other <- rowSums(crops.tot.prod.wide[,other])
+crops.tot.area.wide <- crops.tot.area.wide %>% select(-one_of(other))
+crops.tot.prod.wide <- crops.tot.prod.wide %>% select(-one_of(other))
+
+
+
+    
+  df %>% group_by(x) %>% summarise(y = sum(y))
+  
+         group_by(State_Name, Crop_Year, Crop) %>%
+         summarise(n = dplyr::n(), .groups = "drop") %>%
+         filter(n > 1L) %>%
+
+  a<-crops %>% pivot_wider(names_from = Crop, values_from = Area)
+
+crops <- crops %>% mutate(Crop = replace(Crop,Crop %in% other,"other"))
+a <- crops %>% pivot_wider(names_from = Crop, values_from = Area)
+
+
+
+%>% filter(Crop %in% other)
+
+tail(crop.counts)
+hist(log(crop.counts$values), breaks=100)
+
+```
+
+
