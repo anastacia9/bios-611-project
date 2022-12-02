@@ -4,9 +4,97 @@ author: "Anastacia Wienecke"
 date: "`r Sys.Date()`"
 output: pdf_document
 always_allow_html: true
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
-Install and load packages:
+## Introduction/Relevance
+
+India is an agrarian country - just over half of its working population
+is involved in agriculture, and nearly one fifth of the country's GDP
+comes from this sector [1,2]. India ranks second for crop output of
+rice, wheat, sugarcane, peanuts, cotton, fruits, and vegetables. It
+ranks first for milk, legumes, and jute [3]. India's economy is the
+world's third largest, worth \$2.1 trillion [3].
+
+With climate change, the yearly monsoon rains, which the agricultural
+industry is so dependent upon, have intensified, shortened, and become
+more sporadic [4]. This study will investigate how the agricltural
+industry has responded to this change. These results will shed light on
+the future of India's crop output, help determine which states and
+territories have been hardest hit, and inform decisions on environmental
+policy. To achieve this end, I will analyze two datasets, both
+downloaded from kaggle.com.
+
+The first dataset is titled "Rainfall Data from 1901 to 2017 for India"
+and consists of monthly rainfall measurements for all 28 Indian states
+and 8 Union territories. This land area spans 1.3 million square miles
+(for reference, the land area of the United States is 3.6 million square
+miles) [5]. These data were compiled by kaggle user Sai Saran using
+information available from data.gov.in. All measurements are in
+millimeters and collected by the India Meteorological Department,
+Ministry of Earth Sciences. These measurements span 116 years, giving a
+wide historical perspective, but not preceding the Industrial Revolution
+in the 18th century. I will begin with an initial exploratory analysis
+of the data. The goal is to visualize which areas experience the most
+and the least rainfall. Per quarter-century, I will plot the annual
+rainfall per state, and analyze how it changes over time. I will monitor
+any trends in the way rainfall has changed geographically, which can
+prove useful in predicting the trends of the future. The Finance
+Minister of India, Pranab Mukherjee, calls India's monsoon season "the
+real finance minister" [6].
+
+The second dataset is titled "Crop Production in India" and was uploaded
+to kaggle by user Abhinand. It spans the years 1997 to 2014 and contains
+information for all 28 Indian states, breaking them down into districts.
+Per district, the dataset lists: the season (Kharif - the fall harvest,
+Rabi - the spring harvest, or the whole year), the crop (eg. rice,
+banana, sugarcane, coconut), the farmed area, and the total crop
+production. The units of farmed area and crop production are
+unspecified, but based on published counts from online sources, I will
+attempt to figure out their units. I propose that over time, as rainfall
+patterns change, farmers become forced to adapt and plant different
+crops. The land area covered by certain crops will change too, as will
+their production level.
+
+To tie together crop and rainfall data, I will ask: When the rainfall is
+poor, do the drought-tolerate crops become the most sown? Essentially,
+is there a detectable relationship between rainfall and crop production?
+I predict to see a change in production based on extreme rainfall
+variability, and I would even expect to see this change propagate into
+succeeding years as farmers become concerned about the growing
+unpredictability of monsoons. These results will summarize the effects
+of one component of climate change on agricultural yield.
+
+References:
+
+[1] Sunder, S. (2018, January 29). India economic survey 2018: Farmers
+gain as agriculture mechanisation speeds up, but more R&D needed. The
+Financial Express Stories. Retrieved August 21, 2022, from
+<https://www.financialexpress.com/budget/india-economic-survey-2018-for-farmers-agriculture-gdp-msp/1034266/>
+
+[2] Dr. Neelam Patel and Dr. Tanu Sethi. (n.d.). Rural Women: Key to New
+India's Agrarian Revolution. NITI Aayog. Retrieved August 21, 2022, from
+<https://www.niti.gov.in/rural-women-key-new-indias-agrarian-revolution>
+
+[3] Fao.org. India at a glance \| FAO in India \| Food and Agriculture
+Organization of the United Nations. (n.d.). Retrieved December 2, 2022,
+from <https://www.fao.org/india/fao-in-india/india-at-a-glance/en/>
+
+[4] Denton, B., &; Sengupta, S. (2019, November 25). India's ominous
+future: Too little water, or far too much. The New York Times. Retrieved
+August 21, 2022
+
+[5] Largest countries in the world (by area). Worldometer. (n.d.).
+Retrieved August 21, 2022, from
+<https://www.worldometers.info/geography/largest-countries-in-the-world/>
+
+[6] India cheers as monsoon arrives; hopes of better farm output raised.
+Hindustan Times. (2010, May 31). Retrieved August 21, 2022, from
+<https://www.hindustantimes.com/india/india-cheers-as-monsoon-arrives-hopes-of-better-farm-output-raised/story-Og0hZJ0ULuibRu4y7CVFpO.html>
+
+## Methods
 
 ```{r include=FALSE}
 library(webshot)
@@ -17,182 +105,21 @@ library(mapview)
 library(htmlwidgets)
 library(viridis)
 library(tidyr)
+library(plyr)
+library(ggbiplot)
 ```
 
-```{r}
+Read in rainfall data. Since 1901, the names and boundaries of many
+Indian states and territories have shifted. To account for this, I
+manually grouped and renamed states/territories as applicable.
+
+```{r message=F}
 ### Read in rainfall data (annual per Indian state from 1901-2017)
 rains <- read.csv("data/india_rains.csv") %>% 
          select(-Name,-Jan.Feb,-Mar.May,-June.September,-Oct.Dec)
 
-### Compute median and variance in annual rainfall per state
-meds <- rains %>%
-        group_by(SUBDIVISION) %>%
-        summarise_at(vars(ANNUAL), list(median=median, variance=var))
-meds$stdev <- sqrt(meds$variance)
-meds$stdev.norm <- meds$stdev / meds$median
-meds.order <- meds$SUBDIVISION[order(meds$median, decreasing = TRUE)]
-```
-
-
-```{r fig.height = 10, fig.width = 10}
-### Plot sampling locations on map, color by median annual rainfall
-### At the top left, click the layers button below the zoom function.
-### Select "Esri.WorldImagery" to see the satellite view.
-latlong <- rains %>%
-           select(SUBDIVISION, Latitude, Longitude) %>%
-           distinct() %>%
-           left_join(meds, by="SUBDIVISION")
-
-minmed <- meds$median %>% min() %>% floor()
-maxmed <- meds$median %>% max() %>% ceiling() + 300
-breaks <- seq(from=minmed, to=maxmed, by=300)
-ranges <- length(breaks)
-colors <- rainbow(n = ranges)
-india  <- mapview(latlong, xcol = "Longitude", ycol = "Latitude", crs = 4269,
-                  grid = FALSE, zcol="median", col.regions = colors, at = breaks)
-india
-mapshot(india, file = "figures/india.png")
-saveWidget(india@map, file="figures/india.html")
-```
-
-
-You could turn this into a boxplot too?
-``` {r fig.height = 10, fig.width = 10, echo=FALSE}
-### Assign colors to dataframe
-entrys <- latlong$SUBDIVISION %>% length()
-shades <- rep('', entrys)
-for (i in 1:entrys){
-  distances <- latlong$median[i]-breaks > 0
-  shades[i] <- colors[distances %>% which() %>% max()]}
-latlong$colorful <- shades
-
-
-### Basic barplots of annual rainfall for 1901, 1925, 1950, 1975, 2000, and 2017
-years <- c(1901,1925,1950,1975,2000,2017)
-rains.per25years <- rains %>%
-                    filter(YEAR %in% years) %>%
-                    merge(latlong[c('SUBDIVISION', 'colorful')], 
-                          by=c("SUBDIVISION"))
-meds.factor <- factor(rains.per25years$SUBDIVISION, levels=meds.order)
-rains.per25years <- rains.per25years[order(meds.factor),]
-rains.per25years$SUBDIVISION <- factor(rains.per25years$SUBDIVISION,
-                                       levels = meds.order)
-
-bars <- ggplot(data=rains.per25years, aes(x=SUBDIVISION, y=ANNUAL,
-                                          fill=colorful)) +
-               geom_bar(stat="identity", show.legend = FALSE) +
-               scale_x_discrete(guide = guide_axis(angle = 90)) +
-               facet_grid(YEAR ~ ., scales = "free_y") +
-               coord_cartesian(ylim = c(0, 4500)) +
-               labs(x = "State",
-                    y = "Median Rainfall",
-                title = "Barplot of annual rainfall for years 1901, 1925, 1950,
-                1975, 2000, and 2017")
-bars
-ggsave("figures/quarter_century_rainfall.png", bars)
-```
-
-``` {r echo=FALSE}
-### Median monthly rainfall for each state
-rains.col <- merge(rains, latlong[c('SUBDIVISION', 'colorful')],
-                   by=c("SUBDIVISION"))
-indexs <- c(1,2,3,4,5,8,9,11)
-graphs <- list()
-count  <- 1
-for(i in indexs){
-rains.info <- rains.col %>%
-              filter(colorful %in% colors[i]) %>%
-              pivot_longer(
-                cols = JAN:DEC,
-                names_to = "month",
-                values_to = "rainfall") %>%
-              group_by(month,SUBDIVISION) %>%
-              summarise_at(vars(rainfall), 
-                           list(median=median,
-                                Q1=~quantile(., probs = 0.25),
-                                Q3=~quantile(., probs = 0.75)))
-rains.info$month <- factor(rains.info$month, levels = c("JAN", "FEB", "MAR",
-                                                        "APR", "MAY", "JUN",
-                                                        "JUL", "AUG", "SEP",
-                                                        "OCT", "NOV", "DEC"))
-
-graphs[[count]] <- ggplot(rains.info, aes(month, median, color=SUBDIVISION,
-                                          group=SUBDIVISION)) +
-                          geom_point() +
-                          geom_line() +
-                          #geom_errorbar(aes(ymin = Q1, ymax = Q3)) +
-                          labs(x = "month",
-                               y = "median rainfall between 1901 and 2017")
-ggsave(paste('figures/median_monthly_rainfall_lineplot',as.character(count),'.png',
-             sep=''), graphs[[count]] )
-count <- count + 1 
-}
-graphs
-```
-
-``` {r}
-### Comparison of median annual rainfall and the standard deviation in annual rainfall
-# Non-normalized
-nnorms <- ggplot(data=meds, aes(x=median, y=stdev)) +
-                 geom_line() +
-                 geom_point() +
-                 labs(x = "Median Annual Rainfall",
-                      y = "Standard Deviation in Annual Rainfall",
-                  title = "Line plot of median annual rainfall vs. the standard deviation in annual rainfall")
-ggsave("figures/lineplot_median_stdev_rainfall.png", nnorms)
-nnorms
-
-# Normalized
-norms <- ggplot(data=meds, aes(x=median, y=stdev.norm)) +
-                geom_line() +
-                geom_point() +
-                labs(x = "Median Annual Rainfall",
-                     y = "Scaled Standard Deviation in Annual Rainfall",
-                 title = "Line plot of median annual rainfall vs. the scaled standard deviation in annual rainfall\n(standard deviation divided by median)")
-ggsave("figures/lineplot_median_norm_stdev_rainfall.png", norms)
-norms
-```
-
-Ideas:
-- yearly average rainfall
-- annual rainfall boxplot per subdivision over time
-- with the crops data, try a PCA with crop production of each state in a single year; how much does this change yearly within a 10-year period (or between another set of years). Will need to normalize by total crop production by that state; which states form clusters? is this related to rainfall?
-
-
-``` {r}
-### Read in crops data (annual per Indian state from 1901-2017)
-crops <- read.csv("data/india_crops.csv")
-
-### Standardize state labels between crops data and rains data
-crops.state <- unique(crops$State_Name) # these state names are most accurate according to "knowindia.india.gov.in"
+### Standardize state labels
 rains.state <- unique(rains$SUBDIVISION)
-
-crops <- crops %>%
-         mutate(State_Name = replace(State_Name,
-                                     State_Name=="Assam"|State_Name=='Meghalaya',
-                                     "Assam and Meghalaya")) %>%
-         mutate(State_Name = replace(State_Name,
-                                     State_Name=="Chandigarh"|State_Name=='Haryana',
-                                     "Chandigarh and Haryana")) %>%  
-         mutate(State_Name = replace(State_Name,
-                                     State_Name=="Goa"|State_Name=='Maharashtra',
-                                     "Goa and Maharashtra")) %>%
-         mutate(State_Name = replace(State_Name,
-                                     State_Name=="Manipur"|State_Name=='Mizoram'|
-                                     State_Name=='Nagaland'|State_Name=='Tripura',
-                                     "Nagaland, Manipur, Mizoram, Tripura")) %>% 
-         mutate(State_Name = replace(State_Name,
-                                     State_Name=="Sikkim"|State_Name=='West Bengal',
-                                     "Sikkim and West Bengal")) %>%
-         mutate(State_Name = replace(State_Name,
-                                     State_Name=="Jammu and Kashmir ",
-                                     "Jammu and Kashmir")) %>%  
-         mutate(State_Name = replace(State_Name,
-                                     State_Name=="Telangana ",
-                                     "Telangana")) %>%  
-         filter(!State_Name %in% c('Dadra and Nagar Haveli','Puducherry')) %>%
-         select(State_Name, Crop_Year, Crop, Area, Production)
-
 rains <- rains %>%
          mutate(SUBDIVISION = replace(SUBDIVISION,
                                       SUBDIVISION=="Andaman & Nicobar Islands",
@@ -252,23 +179,312 @@ rains <- rains %>%
                                       SUBDIVISION=="West Uttar Pradesh",
                                       "Uttar Pradesh")) %>% 
          filter(!SUBDIVISION %in% c('Lakshadweep'))
+
+### Re-group according to new labels
+rains <- rains %>%
+         group_by(SUBDIVISION, YEAR) %>%
+         dplyr::summarize(JAN=median(JAN), FEB=median(FEB), MAR=median(MAR),
+                          APR=median(APR), MAY=median(MAY), JUN=median(JUN),
+                          JUL=median(JUL), AUG=median(AUG), SEP=median(SEP),
+                          OCT=median(OCT), NOV=median(NOV), DEC=median(DEC),
+                          ANNUAL=median(ANNUAL),
+                          Latitude=median(Latitude),
+                          Longitude=median(Longitude))
+  
+### Compute median and variance in annual rainfall per state
+meds <- rains %>%
+        group_by(SUBDIVISION) %>%
+        summarise_at(vars(ANNUAL), list(median=median, variance=var))
+meds$stdev <- sqrt(meds$variance)
+meds$stdev.norm <- meds$stdev / meds$median
+meds.order <- meds$SUBDIVISION[order(meds$median, decreasing = TRUE)]
 ```
 
-``` {r}
-### Which crops appear most frequently in this dataset?
-crop.counts <- rev(stack(table(crops$Crop)))
-crop.counts <- crop.counts[order(crop.counts$values, decreasing=T),]
-head(crop.counts)
+The first question we might like to know more about is: What does the median annual rainfall from 1901-2017 look like per state?
+
+```{r fig.height = 10, fig.width = 10, warning=FALSE, message=FALSE, echo=FALSE}
+### Plot sampling locations on map, color by median annual rainfall
+### At the top left, click the layers button below the zoom function.
+### Select "Esri.WorldImagery" to see the satellite view.
+latlong <- rains %>%
+           select(SUBDIVISION, Latitude, Longitude) %>%
+           distinct() %>%
+           left_join(meds, by="SUBDIVISION")
+
+minmed <- meds$median %>% min() %>% floor()
+maxmed <- meds$median %>% max() %>% ceiling() + 300
+breaks <- seq(from=minmed, to=maxmed, by=300)
+ranges <- length(breaks)
+colors <- rainbow(n = ranges)
+india  <- mapview(latlong, xcol = "Longitude", ycol = "Latitude", crs = 4269,
+                  grid = FALSE, zcol="median", col.regions = colors, at = breaks)
+india
+#mapshot(india, file = "figures/india.png")
+saveWidget(india@map, file="figures/india.html")
+```
+In the above widget, if the "Esri.WorldImagery" option is selected in the layer menu, we see that the mountainous and central regions receive the least amount of rain. The coastal areas and islands receive substantial rain. The far east of India is also quite wet, probably because it is far enough away from the mountains that the rain shadow no longer exerts an effect. One follow up question is: what is the variability in annual rainfall for each state and territory between 1901 and 2017?
+
+```{r}
+### Create a boxplot of annual rainfall per state
+ggplot(rains, aes(x=reorder(SUBDIVISION,ANNUAL), y=ANNUAL/1000)) + 
+              scale_x_discrete(guide = guide_axis(angle = 90)) +
+              labs(x = "State", y = "Annual Rainfall (meters)") +
+              geom_boxplot()
+```
+We see that the states with the most rainfall also see the most variability in rainfall.
+
+To understand which states are similar in terms of their monthly median rainfall between 1901-2017, I ran a PCA.
+
+```{r message=F}
+### Run a PCA on monthly median rainfalls
+monthly.med <- aggregate(rains[,3:14], list(rains$SUBDIVISION), median) %>%
+               column_to_rownames(var="Group.1")
+monthly.pca <- prcomp(monthly.med, center = F,scale = F)
+ggbiplot(monthly.pca, labels=rownames(monthly.med), varname.size=2, labels.size=2)+ coord_equal(ratio = 0.3)
+```
+
+We see from the principal components that the most rainfall variability between states occurs in the months of June to September. We could more-or-less predict the state based on knowledge of summer rainfall. Similar to the India map above, here we see clustering of states based on geographic location.
+
+To investigate trends in quarter-century rainfall, below I plot annual rainfall per state in 1901, 1925, 1950, 1975, 2000, and 2017. There are no linear differences through time.
+
+```{r fig.height = 10, fig.width = 10, echo=FALSE}
+### Assign colors to dataframe
+entrys <- latlong$SUBDIVISION %>% length()
+shades <- rep('', entrys)
+for (i in 1:entrys){
+  distances <- latlong$median[i]-breaks > 0
+  shades[i] <- colors[distances %>% which() %>% max()]}
+latlong$colorful <- shades
+
+
+### Basic barplots of annual rainfall for 1901, 1925, 1950, 1975, 2000, and 2017
+years <- c(1901,1925,1950,1975,2000,2017)
+rains.per25years <- rains %>%
+                    filter(YEAR %in% years) %>%
+                    merge(latlong[c('SUBDIVISION', 'colorful')], 
+                          by=c("SUBDIVISION"))
+meds.factor <- factor(rains.per25years$SUBDIVISION, levels=meds.order)
+rains.per25years <- rains.per25years[order(meds.factor),]
+rains.per25years$SUBDIVISION <- factor(rains.per25years$SUBDIVISION,
+                                       levels = meds.order)
+
+bars <- ggplot(data=rains.per25years, aes(x=SUBDIVISION, y=ANNUAL/1000,
+                                          fill=colorful)) +
+               geom_bar(stat="identity", show.legend = FALSE) +
+               scale_x_discrete(guide = guide_axis(angle = 90)) +
+               facet_grid(YEAR ~ ., scales = "free_y") +
+               coord_cartesian(ylim = c(0, 4.5)) +
+               labs(x = "State",
+                    y = "Annual Rainfall (meters)",
+                title = "Barplot of annual rainfall for years 1901, 1925, 1950,
+                1975, 2000, and 2017")
+bars
+#ggsave("figures/quarter_century_rainfall.png", bars)
+```
+
+QUESTION:
+
+```{r echo=FALSE}
+### Median monthly rainfall for each state
+rains.col <- merge(rains, latlong[c('SUBDIVISION', 'colorful')],
+                   by=c("SUBDIVISION"))
+indexs <- c(1,2,3,4,6,7,8,9,10)
+graphs <- list()
+count  <- 1
+for(i in indexs){
+rains.info <- rains.col %>%
+              filter(colorful %in% colors[i]) %>%
+              pivot_longer(
+                cols = JAN:DEC,
+                names_to = "month",
+                values_to = "rainfall") %>%
+              group_by(month,SUBDIVISION) %>%
+              summarise_at(vars(rainfall), 
+                           list(median=median,
+                                Q1=~quantile(., probs = 0.25),
+                                Q3=~quantile(., probs = 0.75)))
+rains.info$month <- factor(rains.info$month, levels = c("JAN", "FEB", "MAR",
+                                                        "APR", "MAY", "JUN",
+                                                        "JUL", "AUG", "SEP",
+                                                        "OCT", "NOV", "DEC"))
+
+graphs[[count]] <- ggplot(rains.info, aes(month, median, color=SUBDIVISION,
+                                          group=SUBDIVISION)) +
+                          geom_point() +
+                          geom_line() +
+                          #geom_errorbar(aes(ymin = Q1, ymax = Q3)) +
+                          labs(x = "month",
+                               y = "median rainfall between 1901 and 2017") +
+                          scale_y_continuous(limits = c(0, 650))
+ggsave(paste('figures/median_monthly_rainfall_lineplot',as.character(count),'.png',
+             sep=''), graphs[[count]] )
+count <- count + 1 
+}
+graphs
+```
+
+QUESTION:
+
+```{r}
+### Comparison of median annual rainfall and the standard deviation in annual rainfall
+# Non-normalized
+nnorms <- ggplot(data=meds, aes(x=median, y=stdev)) +
+                 geom_line() +
+                 geom_point() +
+                 labs(x = "Median Annual Rainfall",
+                      y = "Standard Deviation in Annual Rainfall",
+                  title = "Line plot of median annual rainfall vs. the standard deviation in annual rainfall")
+ggsave("figures/lineplot_median_stdev_rainfall.png", nnorms)
+nnorms
+
+# Normalized
+norms <- ggplot(data=meds, aes(x=median, y=stdev.norm)) +
+                geom_line() +
+                geom_point() +
+                labs(x = "Median Annual Rainfall",
+                     y = "Scaled Standard Deviation in Annual Rainfall",
+                 title = "Line plot of median annual rainfall vs. the scaled standard deviation in annual rainfall\n(standard deviation divided by median)")
+ggsave("figures/lineplot_median_norm_stdev_rainfall.png", norms)
+norms
+```
+
+Ideas: - with the crops data, try a PCA with crop production of each
+state in a single year; how much does this change yearly within a
+10-year period (or between another set of years). Will need to normalize
+by total crop production by that state; which states form clusters? is
+this related to rainfall?
+
+```{r}
+### Read in crops data (annual per Indian state from 1901-2017)
+crops <- read.csv("data/india_crops.csv")
+
+### Standardize state labels
+### These state names are most accurate according to "knowindia.india.gov.in"
+crops.state <- unique(crops$State_Name)
+crops <- crops %>%
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Assam"|State_Name=='Meghalaya',
+                                     "Assam and Meghalaya")) %>%
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Chandigarh"|State_Name=='Haryana',
+                                     "Chandigarh and Haryana")) %>%  
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Goa"|State_Name=='Maharashtra',
+                                     "Goa and Maharashtra")) %>%
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Manipur"|State_Name=='Mizoram'|
+                                     State_Name=='Nagaland'|State_Name=='Tripura',
+                                     "Nagaland, Manipur, Mizoram, Tripura")) %>% 
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Sikkim"|State_Name=='West Bengal',
+                                     "Sikkim and West Bengal")) %>%
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Jammu and Kashmir ",
+                                     "Jammu and Kashmir")) %>%  
+         mutate(State_Name = replace(State_Name,
+                                     State_Name=="Telangana ",
+                                     "Telangana")) %>%  
+         filter(!State_Name %in% c('Dadra and Nagar Haveli','Puducherry')) %>%
+         select(State_Name, Crop_Year, Crop, Area, Production)
+
+### Re-group according to new labels
+crops <- crops %>%
+         group_by(State_Name, Crop_Year, Crop) %>%
+         dplyr::summarize(Area=sum(Area), Production=sum(Production))
+```
+
+```{r}
+### Which crops appear most frequently?
+crop.counts <- crops$Crop %>% table() %>% stack() %>% rev()
+crop.counts <- crop.counts[order(crop.counts$values, decreasing=T), ]
+head(crop.counts,15)
+freq.hi <- crop.counts$ind[1:50]
 
 ### Get total crop area and production for each state per year
-crops.tot.area <- crops %>% group_by(State_Name, Crop_Year, Crop) %>% summarise(Area = sum(Area))
-crops.tot.prod <- crops %>% group_by(State_Name, Crop_Year, Crop) %>% summarise(Production = sum(Production))
-crops.tot.area.wide <- crops.tot.area %>% 
+crops.area.wide <- crops[,c('State_Name','Crop_Year','Crop', 'Area')] %>% 
                        pivot_wider(names_from = Crop, values_from = Area) %>%
                        replace(is.na(.), 0)
-crops.tot.prod.wide <- crops.tot.prod %>% 
+crops.prod.wide <- crops[,c('State_Name','Crop_Year','Crop', 'Production')] %>% 
                        pivot_wider(names_from = Crop, values_from = Production) %>%
                        replace(is.na(.), 0)
+
+### Which crops are most heavily produced over time (number of bushels)?
+prod.sort <- crops.prod.wide[3:126] %>%
+             colSums() %>%
+             sort(decreasing=T) %>%
+             data.frame()
+colnames(prod.sort) <- c('sum_production')
+head(prod.sort,15)
+prod.hi <- rownames(prod.sort)[1:50]
+
+### Which crops cover the most area over time (number of square-meters)?
+area.sort <- crops.area.wide[3:126] %>%
+             colSums() %>%
+             sort(decreasing=T) %>%
+             data.frame()
+colnames(area.sort) <- c('sum_area')
+head(area.sort,15)
+area.hi <- rownames(area.sort)[1:50]
+```
+
+QUESTION:
+
+```{r}
+### Run a PCA on median crop production 
+common.crops <- intersect(freq.hi, intersect(area.hi, prod.hi))
+monthly.med <- aggregate(crops.area.wide[,common.crops], list(crops.area.wide$State_Name), median) %>%
+               column_to_rownames(var="Group.1")
+monthly.pca <- prcomp(monthly.med, center = F,scale = F)
+ggbiplot(monthly.pca, labels=rownames(monthly.med), varname.size=1.5, labels.size=2)+ coord_equal(ratio = 0.3)
+```
+
+```{r}
+### Focus on Rice and Wheat, two very thirsty crops
+mycrops <- common.crops[rev(order(prod.sort[common.crops,]))][2:11]
+focus.crops <- c('State_Name','Crop_Year', mycrops)
+focus.area <- crops.area.wide[,focus.crops]
+focus.prod <- crops.prod.wide[,focus.crops]
+focus.prod.Y <- ddply(focus.prod, "Crop_Year", numcolwise(sum))
+
+rains.Y <- rains.sum.annual %>% subset(YEAR %in% focus.prod.Y$Crop_Year)
+focus.prod.Y$Rain <- rains.Y$ANNUAL
+
+ggplot(focus.prod.Y %>% 
+         select(-Sugarcane, -Jute, -Banana, -Rain) %>% 
+         pivot_longer(!Crop_Year), aes(x = Crop_Year, y = value, color = name)) + 
+  geom_line() +
+  geom_line(data=focus.prod.Y, aes(x=Crop_Year, y=Rain*2000), color = "red") +
+  scale_x_continuous(breaks=seq(1997, 2015), guide = guide_axis(angle = 90)) +
+  scale_y_continuous(
+   name = "Annual Crop Production",
+   sec.axis = sec_axis(~ . * 1/2000, name="Median Annual Rainfall")) +
+  xlab('Year') +
+  theme(panel.grid.minor.x = element_blank())
+```
+
+NEXT: create a plot of india that shows production/area of each of these
+crops
+
+```{r}
+
+
+
+
+
+### Let's focus on crops in the top 50 most produced list and the top 50 most wide-spread list
+Reduce(intersect,  list(hi.counts, hi.prod))
+
+
+### Let's focus on the top 10 of these...
+
+crops.area.15 <- c
+crops.prod.15 <- crops.tot.prod.wide[,hi.crops]
+
+
+
+
+
+
 
 ### Combine crops that appear less than 500 times as "other"
 other <- crop.counts$ind[crop.counts$values<500]
@@ -276,7 +492,7 @@ crops.tot.area.wide$other <- rowSums(crops.tot.area.wide[,other])
 crops.tot.prod.wide$other <- rowSums(crops.tot.prod.wide[,other])
 crops.tot.area.wide <- crops.tot.area.wide %>% select(-one_of(other))
 crops.tot.prod.wide <- crops.tot.prod.wide %>% select(-one_of(other))
-
+dim(crops.tot.prod.wide)
 
 
     
@@ -299,5 +515,3 @@ tail(crop.counts)
 hist(log(crop.counts$values), breaks=100)
 
 ```
-
-
