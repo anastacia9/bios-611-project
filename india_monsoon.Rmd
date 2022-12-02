@@ -94,7 +94,11 @@ Retrieved August 21, 2022, from
 Hindustan Times. (2010, May 31). Retrieved August 21, 2022, from
 <https://www.hindustantimes.com/india/india-cheers-as-monsoon-arrives-hopes-of-better-farm-output-raised/story-Og0hZJ0ULuibRu4y7CVFpO.html>
 
-## Methods
+[7] Pti. (2022, September 9). Government says India's rice production may fall by 10-12 million tonnes in Kharif season this year. Return to frontpage. Retrieved December 2, 2022, from <https://www.thehindu.com/news/national/government-says-indias-rice-production-may-fall-by-10-12-million-tonnes-in-kharif-season-this-year/article65869909.ece>
+
+[8] Published by Statista Research Department, (2022, March 16). India: Area of cultivation for rice 2021. Statista. Retrieved December 2, 2022, from <https://www.statista.com/statistics/765691/india-area-of-cultivation-for-rice/>
+
+## Methods and Results
 
 ```{r include=FALSE}
 library(webshot)
@@ -108,6 +112,8 @@ library(tidyr)
 library(plyr)
 library(ggbiplot)
 ```
+
+## Exploratory Analysis of Rainfall Data
 
 Read in rainfall data. Since 1901, the names and boundaries of many
 Indian states and territories have shifted. To account for this, I
@@ -200,7 +206,8 @@ meds$stdev.norm <- meds$stdev / meds$median
 meds.order <- meds$SUBDIVISION[order(meds$median, decreasing = TRUE)]
 ```
 
-The first question we might like to know more about is: What does the median annual rainfall from 1901-2017 look like per state?
+The first question we might like to know more about is: What does the
+median annual rainfall from 1901-2017 look like per state?
 
 ```{r fig.height = 10, fig.width = 10, warning=FALSE, message=FALSE, echo=FALSE}
 ### Plot sampling locations on map, color by median annual rainfall
@@ -222,7 +229,15 @@ india
 #mapshot(india, file = "figures/india.png")
 saveWidget(india@map, file="figures/india.html")
 ```
-In the above widget, if the "Esri.WorldImagery" option is selected in the layer menu, we see that the mountainous and central regions receive the least amount of rain. The coastal areas and islands receive substantial rain. The far east of India is also quite wet, probably because it is far enough away from the mountains that the rain shadow no longer exerts an effect. One follow up question is: what is the variability in annual rainfall for each state and territory between 1901 and 2017?
+
+In the above widget, if the "Esri.WorldImagery" option is selected in
+the layer menu, we see that the mountainous and central regions receive
+the least amount of rain. The coastal areas and islands receive
+substantial rain. The far east of India is also quite wet, probably
+because it is far enough away from the mountains that the rain shadow no
+longer exerts an effect. One follow up question is: what is the
+variability in annual rainfall for each state and territory between 1901
+and 2017?
 
 ```{r}
 ### Create a boxplot of annual rainfall per state
@@ -231,9 +246,12 @@ ggplot(rains, aes(x=reorder(SUBDIVISION,ANNUAL), y=ANNUAL/1000)) +
               labs(x = "State", y = "Annual Rainfall (meters)") +
               geom_boxplot()
 ```
-We see that the states with the most rainfall also see the most variability in rainfall.
 
-To understand which states are similar in terms of their monthly median rainfall between 1901-2017, I ran a PCA.
+We see that the states with the most rainfall also see the most
+variability in rainfall.
+
+To understand which states are similar in terms of their monthly median
+rainfall between 1901-2017, I ran a PCA.
 
 ```{r message=F}
 ### Run a PCA on monthly median rainfalls
@@ -243,9 +261,15 @@ monthly.pca <- prcomp(monthly.med, center = F,scale = F)
 ggbiplot(monthly.pca, labels=rownames(monthly.med), varname.size=2, labels.size=2)+ coord_equal(ratio = 0.3)
 ```
 
-We see from the principal components that the most rainfall variability between states occurs in the months of June to September. We could more-or-less predict the state based on knowledge of summer rainfall. Similar to the India map above, here we see clustering of states based on geographic location.
+We see from the principal components that the most rainfall variability
+between states occurs in the months of June to September. We could
+more-or-less predict the state based on knowledge of summer rainfall.
+Similar to the India map above, here we see clustering of states based
+on geographic location.
 
-To investigate trends in quarter-century rainfall, below I plot annual rainfall per state in 1901, 1925, 1950, 1975, 2000, and 2017. There are no linear differences through time.
+To investigate trends in quarter-century rainfall, below I plot annual
+rainfall per state in 1901, 1925, 1950, 1975, 2000, and 2017. There are
+no linear differences through time.
 
 ```{r fig.height = 10, fig.width = 10, echo=FALSE}
 ### Assign colors to dataframe
@@ -282,7 +306,9 @@ bars
 #ggsave("figures/quarter_century_rainfall.png", bars)
 ```
 
-QUESTION:
+Looking back to the India map, we might like to group states based on
+median annual rainfall over the span 1901-2017. In these groupings, we
+might like to see each state's median monthly rainfall over 1901-2017.
 
 ```{r echo=FALSE}
 ### Median monthly rainfall for each state
@@ -314,7 +340,7 @@ graphs[[count]] <- ggplot(rains.info, aes(month, median, color=SUBDIVISION,
                           geom_line() +
                           #geom_errorbar(aes(ymin = Q1, ymax = Q3)) +
                           labs(x = "month",
-                               y = "median rainfall between 1901 and 2017") +
+                               y = "median rainfall (mm) between 1901 and 2017") +
                           scale_y_continuous(limits = c(0, 650))
 ggsave(paste('figures/median_monthly_rainfall_lineplot',as.character(count),'.png',
              sep=''), graphs[[count]] )
@@ -323,39 +349,53 @@ count <- count + 1
 graphs
 ```
 
-QUESTION:
+From these results, we see that rainfall always peaks in the summer. We
+also see that states with similar annual rainfall have very similar
+monthly patterns of rainfall.
+
+The plots above hint that a greater annual rainfall is linked to a
+higher variability in rainfall. Let's explore this more systematically.
+For instance, is there a relationship between the median annual rainfall
+and the standard deviation in annual rainfall between 1901 and 2017?
 
 ```{r}
 ### Comparison of median annual rainfall and the standard deviation in annual rainfall
 # Non-normalized
-nnorms <- ggplot(data=meds, aes(x=median, y=stdev)) +
+nnorms <- ggplot(data=meds, aes(x=median/1000, y=stdev)) +
                  geom_line() +
                  geom_point() +
-                 labs(x = "Median Annual Rainfall",
-                      y = "Standard Deviation in Annual Rainfall",
-                  title = "Line plot of median annual rainfall vs. the standard deviation in annual rainfall")
-ggsave("figures/lineplot_median_stdev_rainfall.png", nnorms)
+                 labs(x = "Median Annual Rainfall (meters)",
+                      y = "Standard Deviation in Annual Rainfall")
+#ggsave("figures/lineplot_median_stdev_rainfall.png", nnorms)
 nnorms
+```
 
+Perhaps the relationship we see is muddied by the magnitude of the data.
+For instance, an equal-sized variation in rainfall in drier states is
+much more impactful than in wetter states. Let's normalize the standard
+deviation by the median and replot.
+
+```{r}
+### Comparison of median annual rainfall and the standard deviation in annual rainfall
 # Normalized
-norms <- ggplot(data=meds, aes(x=median, y=stdev.norm)) +
+norms <- ggplot(data=meds, aes(x=median/1000, y=stdev.norm)) +
                 geom_line() +
                 geom_point() +
-                labs(x = "Median Annual Rainfall",
-                     y = "Scaled Standard Deviation in Annual Rainfall",
-                 title = "Line plot of median annual rainfall vs. the scaled standard deviation in annual rainfall\n(standard deviation divided by median)")
-ggsave("figures/lineplot_median_norm_stdev_rainfall.png", norms)
+                labs(x = "Median Annual Rainfall (meters)",
+                     y = "Scaled Standard Deviation in Annual Rainfall")
+#ggsave("figures/lineplot_median_norm_stdev_rainfall.png", norms)
 norms
 ```
 
-Ideas: - with the crops data, try a PCA with crop production of each
-state in a single year; how much does this change yearly within a
-10-year period (or between another set of years). Will need to normalize
-by total crop production by that state; which states form clusters? is
-this related to rainfall?
+Here we see that states at the high and low extremes of rainfall
+experience the most (relative) variation in rainfall.
+
+## Exploratory Analysis of Crop Production Data
+
+Read in crop production data. Make sure that the state and territory naming conventions match those from the rainfall data. Re-group as necessary. Note: while the rainfall data spans years 1901-2017, this crop data spans 1997-2015.
 
 ```{r}
-### Read in crops data (annual per Indian state from 1901-2017)
+### Read in crops data (annual per Indian state from 1997 to 2015)
 crops <- read.csv("data/india_crops.csv")
 
 ### Standardize state labels
@@ -393,13 +433,16 @@ crops <- crops %>%
          dplyr::summarize(Area=sum(Area), Production=sum(Production))
 ```
 
+Let's determine which crops appear most frequently in the dataset.
 ```{r}
 ### Which crops appear most frequently?
 crop.counts <- crops$Crop %>% table() %>% stack() %>% rev()
 crop.counts <- crop.counts[order(crop.counts$values, decreasing=T), ]
 head(crop.counts,15)
 freq.hi <- crop.counts$ind[1:50]
-
+```
+Now let's see which crops are the most heavily produced over time.
+``` {r}
 ### Get total crop area and production for each state per year
 crops.area.wide <- crops[,c('State_Name','Crop_Year','Crop', 'Area')] %>% 
                        pivot_wider(names_from = Crop, values_from = Area) %>%
@@ -408,7 +451,7 @@ crops.prod.wide <- crops[,c('State_Name','Crop_Year','Crop', 'Production')] %>%
                        pivot_wider(names_from = Crop, values_from = Production) %>%
                        replace(is.na(.), 0)
 
-### Which crops are most heavily produced over time (number of bushels)?
+### Which crops are most heavily produced over time?
 prod.sort <- crops.prod.wide[3:126] %>%
              colSums() %>%
              sort(decreasing=T) %>%
@@ -416,8 +459,11 @@ prod.sort <- crops.prod.wide[3:126] %>%
 colnames(prod.sort) <- c('sum_production')
 head(prod.sort,15)
 prod.hi <- rownames(prod.sort)[1:50]
+```
+Based on the result that coconut is the most produced crop, I imagine that the units of this measurement must be weight. One online source reports that 130 million tonnes of rice were produced in the year 2021-2022. This data says that the average rice production between 1997-2015 was roughly 85 million units [7]. As such, I imagine that the production unit for this data is tonnes.
 
-### Which crops cover the most area over time (number of square-meters)?
+``` {r}
+### Which crops cover the most area over time?
 area.sort <- crops.area.wide[3:126] %>%
              colSums() %>%
              sort(decreasing=T) %>%
@@ -426,10 +472,11 @@ colnames(area.sort) <- c('sum_area')
 head(area.sort,15)
 area.hi <- rownames(area.sort)[1:50]
 ```
+We see that rice has covered the most area over time. On average 41.5 million units of rice covered India per year. One online source reports that 45 million hectares were covered in rice in the crop year 2021 [8]. I conclude that hectares must be the unit of measurement for crop production in these data.
 
-QUESTION:
+To see which states and territories are most similar in their crop production, let's run a PCA.
 
-```{r}
+```{r message=FALSE}
 ### Run a PCA on median crop production 
 common.crops <- intersect(freq.hi, intersect(area.hi, prod.hi))
 monthly.med <- aggregate(crops.area.wide[,common.crops], list(crops.area.wide$State_Name), median) %>%
@@ -437,6 +484,9 @@ monthly.med <- aggregate(crops.area.wide[,common.crops], list(crops.area.wide$St
 monthly.pca <- prcomp(monthly.med, center = F,scale = F)
 ggbiplot(monthly.pca, labels=rownames(monthly.med), varname.size=1.5, labels.size=2)+ coord_equal(ratio = 0.3)
 ```
+From these results, we see that the driest states are the ones furthest from the cluster at the origin. Rice and wheat are the main crops whose production appreciably differs between states and leads to clustering. Rice and wheat are also some of the thristiest crops.
+
+## Combining Rainfall and Crop Production - Focusing on Rice and Wheat
 
 ```{r}
 ### Focus on Rice and Wheat, two very thirsty crops
@@ -456,11 +506,14 @@ ggplot(focus.prod.Y %>%
   geom_line(data=focus.prod.Y, aes(x=Crop_Year, y=Rain*2000), color = "red") +
   scale_x_continuous(breaks=seq(1997, 2015), guide = guide_axis(angle = 90)) +
   scale_y_continuous(
-   name = "Annual Crop Production",
-   sec.axis = sec_axis(~ . * 1/2000, name="Median Annual Rainfall")) +
+   name = "Annual Crop Production (tonnes)",
+   sec.axis = sec_axis(~ . * 1/2000, name="Median Annual Rainfall (mm)")) +
   xlab('Year') +
   theme(panel.grid.minor.x = element_blank())
 ```
+
+
+
 
 NEXT: create a plot of india that shows production/area of each of these
 crops
