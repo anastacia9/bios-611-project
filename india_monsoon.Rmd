@@ -1,5 +1,5 @@
 ---
-title: "india_monsoon"
+title: "Investigating the Relationship Between Rainfall and Crop Production in India"
 author: "Anastacia Wienecke"
 date: "`r Sys.Date()`"
 output: pdf_document
@@ -9,23 +9,23 @@ editor_options:
     wrap: 72
 ---
 
-## Introduction/Relevance
+## Introduction
 
 India is an agrarian country - just over half of its working population
 is involved in agriculture, and nearly one fifth of the country's GDP
-comes from this sector [1,2]. India ranks second for crop output of
-rice, wheat, sugarcane, peanuts, cotton, fruits, and vegetables. It
-ranks first for milk, legumes, and jute [3]. India's economy is the
-world's third largest, worth \$2.1 trillion [3].
+comes from this sector [1,2]. India ranks second in the world for
+production of rice, wheat, sugarcane, peanuts, cotton, fruits, and
+vegetables. It ranks first for milk, legumes, and jute [3]. The Indian
+economy is the world's third largest, worth \$2.1 trillion [3].
 
 With climate change, the yearly monsoon rains, which the agricultural
 industry is so dependent upon, have intensified, shortened, and become
-more sporadic [4]. This study will investigate how the agricltural
-industry has responded to this change. These results will shed light on
-the future of India's crop output, help determine which states and
-territories have been hardest hit, and inform decisions on environmental
-policy. To achieve this end, I will analyze two datasets, both
-downloaded from kaggle.com.
+more sporadic [4]. This study will investigate how farming practices
+have responded to this change. These results will shed light on the
+future of India's crop output, help determine which states and
+territories have been hardest hit, which states and territories are most
+at risk, and inform decisions on environmental policy. To achieve this
+end, I will analyze two datasets, both downloaded from kaggle.com.
 
 The first dataset is titled "Rainfall Data from 1901 to 2017 for India"
 and consists of monthly rainfall measurements for all 28 Indian states
@@ -33,17 +33,17 @@ and 8 Union territories. This land area spans 1.3 million square miles
 (for reference, the land area of the United States is 3.6 million square
 miles) [5]. These data were compiled by kaggle user Sai Saran using
 information available from data.gov.in. All measurements are in
-millimeters and collected by the India Meteorological Department,
+millimeters and collected by the Indian Meteorological Department,
 Ministry of Earth Sciences. These measurements span 116 years, giving a
 wide historical perspective, but not preceding the Industrial Revolution
-in the 18th century. I will begin with an initial exploratory analysis
-of the data. The goal is to visualize which areas experience the most
-and the least rainfall. Per quarter-century, I will plot the annual
-rainfall per state, and analyze how it changes over time. I will monitor
-any trends in the way rainfall has changed geographically, which can
-prove useful in predicting the trends of the future. The Finance
-Minister of India, Pranab Mukherjee, calls India's monsoon season "the
-real finance minister" [6].
+of the 18th century (which would have been quite interesting). I will
+begin with an initial exploratory analysis of the data. The goal is to
+visualize which areas experience the most and the least rainfall. Per
+quarter-century, I will plot the annual rainfall per state, and analyze
+any changes over time. I will monitor any trends in the way rainfall has
+changed geographically, which can prove useful for predicting trends of
+the future. The Finance Minister of India, Pranab Mukherjee, calls
+India's monsoon season "the real finance minister" [6].
 
 The second dataset is titled "Crop Production in India" and was uploaded
 to kaggle by user Abhinand. It spans the years 1997 to 2014 and contains
@@ -52,55 +52,25 @@ Per district, the dataset lists: the season (Kharif - the fall harvest,
 Rabi - the spring harvest, or the whole year), the crop (eg. rice,
 banana, sugarcane, coconut), the farmed area, and the total crop
 production. The units of farmed area and crop production are
-unspecified, but based on published counts from online sources, I will
-attempt to figure out their units. I propose that over time, as rainfall
-patterns change, farmers become forced to adapt and plant different
-crops. The land area covered by certain crops will change too, as will
-their production level.
+unspecified, but based on published statistics from various online
+sources, I will attempt to identify these units. I propose that over
+time, as rainfall patterns change, farmers become forced to adapt and
+plant different crops. The land area covered by certain crops will
+probably change too, as will their production levels.
 
 To tie together crop and rainfall data, I will ask: When the rainfall is
-poor, do the drought-tolerate crops become the most sown? Essentially,
-is there a detectable relationship between rainfall and crop production?
-I predict to see a change in production based on extreme rainfall
-variability, and I would even expect to see this change propagate into
-succeeding years as farmers become concerned about the growing
-unpredictability of monsoons. These results will summarize the effects
-of one component of climate change on agricultural yield.
-
-References:
-
-[1] Sunder, S. (2018, January 29). India economic survey 2018: Farmers
-gain as agriculture mechanisation speeds up, but more R&D needed. The
-Financial Express Stories. Retrieved August 21, 2022, from
-<https://www.financialexpress.com/budget/india-economic-survey-2018-for-farmers-agriculture-gdp-msp/1034266/>
-
-[2] Dr. Neelam Patel and Dr. Tanu Sethi. (n.d.). Rural Women: Key to New
-India's Agrarian Revolution. NITI Aayog. Retrieved August 21, 2022, from
-<https://www.niti.gov.in/rural-women-key-new-indias-agrarian-revolution>
-
-[3] Fao.org. India at a glance \| FAO in India \| Food and Agriculture
-Organization of the United Nations. (n.d.). Retrieved December 2, 2022,
-from <https://www.fao.org/india/fao-in-india/india-at-a-glance/en/>
-
-[4] Denton, B., &; Sengupta, S. (2019, November 25). India's ominous
-future: Too little water, or far too much. The New York Times. Retrieved
-August 21, 2022
-
-[5] Largest countries in the world (by area). Worldometer. (n.d.).
-Retrieved August 21, 2022, from
-<https://www.worldometers.info/geography/largest-countries-in-the-world/>
-
-[6] India cheers as monsoon arrives; hopes of better farm output raised.
-Hindustan Times. (2010, May 31). Retrieved August 21, 2022, from
-<https://www.hindustantimes.com/india/india-cheers-as-monsoon-arrives-hopes-of-better-farm-output-raised/story-Og0hZJ0ULuibRu4y7CVFpO.html>
-
-[7] Pti. (2022, September 9). Government says India's rice production may fall by 10-12 million tonnes in Kharif season this year. Return to frontpage. Retrieved December 2, 2022, from <https://www.thehindu.com/news/national/government-says-indias-rice-production-may-fall-by-10-12-million-tonnes-in-kharif-season-this-year/article65869909.ece>
-
-[8] Published by Statista Research Department, (2022, March 16). India: Area of cultivation for rice 2021. Statista. Retrieved December 2, 2022, from <https://www.statista.com/statistics/765691/india-area-of-cultivation-for-rice/>
+low, do the drought-tolerant crops become the most sown? Essentially, is
+there a detectable relationship between rainfall and crop production?
+For which crops? I predict to see a change in production based on
+extreme rainfall variability, and I would even expect to see this change
+propagate into succeeding years as farmers become concerned about the
+growing unpredictability of monsoons. These results will summarize the
+effects of one component of climate change on agricultural yield.
 
 ## Methods and Results
 
 ```{r include=FALSE}
+### Load libraries
 library(webshot)
 library(terra)
 library(tidyverse)
@@ -111,13 +81,16 @@ library(viridis)
 library(tidyr)
 library(plyr)
 library(ggbiplot)
+library(ggpubr)
 ```
 
 ## Exploratory Analysis of Rainfall Data
 
-Read in rainfall data. Since 1901, the names and boundaries of many
-Indian states and territories have shifted. To account for this, I
-manually grouped and renamed states/territories as applicable.
+I begin by reading in rainfall data. Since 1901, the names and
+boundaries of many Indian states and territories have changed,
+especially after the end of the British imperial period in 1947. To
+account for this, I manually grouped and renamed states and territories
+where applicable.
 
 ```{r message=F}
 ### Read in rainfall data (annual per Indian state from 1901-2017)
@@ -206,10 +179,95 @@ meds$stdev.norm <- meds$stdev / meds$median
 meds.order <- meds$SUBDIVISION[order(meds$median, decreasing = TRUE)]
 ```
 
-The first question we might like to know more about is: What does the
+Next, I read in land area for each state and territory. These values come from the Office of the Registrar General of India, Ministry of Home Affairs. It was compiled as part of their 2011 Census and the units are square-kilometers.
+
+```{r}
+### Read in area data
+areas <- read.csv("data/india_areas.csv")
+colnames(areas) <- c('SUBDIVISION', 'area')
+
+### Standardize state labels
+areas <- areas %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="A.& N.Islands",
+                                     "Andaman and Nicobar Islands")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Assam"|
+                                      SUBDIVISION=="Meghalaya",
+                                      "Assam and Meghalaya")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Haryana"|
+                                      SUBDIVISION=="Delhi"|
+                                      SUBDIVISION=="Chandigarh",
+                                      "Chandigarh and Haryana")) %>%  
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Goa"|
+                                      SUBDIVISION=="Maharashtra",
+                                      "Goa and Maharashtra")) %>%  
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Jammu & Kashmir",
+                                      "Jammu and Kashmir")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Nagaland"|
+                                      SUBDIVISION=="Manipur"|
+                                      SUBDIVISION=="Mizoram"|
+                                      SUBDIVISION=="Tripura",
+                                      "Nagaland, Manipur, Mizoram, Tripura")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Orissa",
+                                      "Odisha")) %>%
+         mutate(SUBDIVISION = replace(SUBDIVISION,
+                                      SUBDIVISION=="Sikkim"|
+                                      SUBDIVISION=="West Bengal",
+                                      "Sikkim and West Bengal")) %>%
+         filter(!SUBDIVISION %in% c('Lakshadweep', 'D.& N.Haveli', 'Daman & Diu', 'Lakshadweep' ))
+
+### Combine relevant area measurements
+areas <- areas %>%
+         group_by(SUBDIVISION) %>%
+         dplyr::summarize(area=sum(area))
+
+### Add column of areas to rains dataframe
+rains <- rains %>%
+           distinct() %>%
+           left_join(areas, by="SUBDIVISION")
+```
+
+To begin the exploratory analysis as broadly as possible, I had planned to plot year vs. annual rainfall across the entire country. However, because I have rainfall data per subdivision only, I had to take a different approach. I will compute an estimate of the annual rainfall country-wide. To begin, I find that the smallest region area-wise is the Andaman and Nicobar Islands (ANI), with an area of 8249 square kilometers. Then I:
+
+1. Find how many ANI land areas fit inside each state and territory, rounding to the nearest integer.
+
+2. Multiply a subdivision's annual rainfall by the value from part 1.
+
+3. By year, sum corresponding values from part 2, divide by the total number of ANI land areas that fit inside of India.
+
+
+```{r warning=F, echo=F, message=F}
+### Step 1: find how many ANI land areas fit inside each state and territory
+rains$num.sectors <- round(rains$area/8249)
+
+### Step 2: multiply each subdivision's annual rainfall by the number of ANI land areas that fit inside of it
+rains$num.sectors.rain <- rains$ANNUAL * rains$num.sectors
+
+### Step 3: group by year, sum corresponding values from step 2, divide by the total number of ANI land areas that fit inside India
+rains.all.india <- rains %>%
+                   select(YEAR, ANNUAL, num.sectors, num.sectors.rain) %>%
+                   group_by(YEAR) %>%
+                   dplyr::summarize(ANNUAL.rain=sum(num.sectors.rain)/sum(num.sectors))
+
+ggplot(data=rains.all.india, aes(x=YEAR, y=ANNUAL.rain)) +
+  geom_line()+
+  geom_point()+
+  geom_smooth(method = "loess")+
+  labs(x = "Year",y = "Annual Rainfall (mm) Per Square Kilometer for India")
+```
+
+As we see from the plot above, the loess smoothing curve shows a quick increase and then a gradual decrease in rainfall country-wide. This decrease began at about the year 1937. In general, the annual rainfall is near 1150mm, which agrees with online sources [7].
+
+To continue, The first question we might like to know more about is: What does the
 median annual rainfall from 1901-2017 look like per state?
 
-```{r fig.height = 10, fig.width = 10, warning=FALSE, message=FALSE, echo=FALSE}
+```{r warning=F, message=F, echo=F}
 ### Plot sampling locations on map, color by median annual rainfall
 ### At the top left, click the layers button below the zoom function.
 ### Select "Esri.WorldImagery" to see the satellite view.
@@ -227,16 +285,16 @@ india  <- mapview(latlong, xcol = "Longitude", ycol = "Latitude", crs = 4269,
                   grid = FALSE, zcol="median", col.regions = colors, at = breaks)
 india
 #mapshot(india, file = "figures/india.png")
-saveWidget(india@map, file="figures/india.html")
+#saveWidget(india@map, file="figures/india.html")
 ```
 
-In the above widget, if the "Esri.WorldImagery" option is selected in
+In the above widget, if the "Esri.WorldImagery" option is selected from
 the layer menu, we see that the mountainous and central regions receive
-the least amount of rain. The coastal areas and islands receive
+the least amount of rain, while the coastal areas and islands receive
 substantial rain. The far east of India is also quite wet, probably
 because it is far enough away from the mountains that the rain shadow no
-longer exerts an effect. One follow up question is: what is the
-variability in annual rainfall for each state and territory between 1901
+longer exerts an effect. One follow up question is: what does the
+variability in annual rainfall for each state and territory look like between 1901
 and 2017?
 
 ```{r}
@@ -247,11 +305,10 @@ ggplot(rains, aes(x=reorder(SUBDIVISION,ANNUAL), y=ANNUAL/1000)) +
               geom_boxplot()
 ```
 
-We see that the states with the most rainfall also see the most
-variability in rainfall.
+It appears that the states with the most rainfall also experience the most variability in rainfall. I will explore this further below. Outlier datapoints do not seem to be an issue here.
 
-To understand which states are similar in terms of their monthly median
-rainfall between 1901-2017, I ran a PCA.
+To understand which states are most similar in terms of their monthly median
+rainfall between 1901-2017, I ran a principle component analysis (PCA). States that cluster close together are most similar in their rainfall amounts and patterns, while states that are far apart in the PCA plot, are more dissimilar.
 
 ```{r message=F}
 ### Run a PCA on monthly median rainfalls
@@ -262,14 +319,14 @@ ggbiplot(monthly.pca, labels=rownames(monthly.med), varname.size=2, labels.size=
 ```
 
 We see from the principal components that the most rainfall variability
-between states occurs in the months of June to September. We could
-more-or-less predict the state based on knowledge of summer rainfall.
-Similar to the India map above, here we see clustering of states based
+between states occurs in the months of June to September. These four months explain the differences in rainfall between states best. As such, we could
+more-or-less predict the state ID based on knowledge of summer rainfall.
+Similar to the map of India above, here we see clustering of states based
 on geographic location.
 
 To investigate trends in quarter-century rainfall, below I plot annual
 rainfall per state in 1901, 1925, 1950, 1975, 2000, and 2017. There are
-no linear differences through time.
+no apparent linear differences through time.
 
 ```{r fig.height = 10, fig.width = 10, echo=FALSE}
 ### Assign colors to dataframe
@@ -306,11 +363,11 @@ bars
 #ggsave("figures/quarter_century_rainfall.png", bars)
 ```
 
-Looking back to the India map, we might like to group states based on
-median annual rainfall over the span 1901-2017. In these groupings, we
+Looking back to the map of India above, we might like to group states based on
+median annual rainfall over the span of 1901-2017. In these groupings, we
 might like to see each state's median monthly rainfall over 1901-2017.
 
-```{r echo=FALSE}
+```{r fig.width=30, fig.height=30, echo=F, message=F, warning=F}
 ### Median monthly rainfall for each state
 rains.col <- merge(rains, latlong[c('SUBDIVISION', 'colorful')],
                    by=c("SUBDIVISION"))
@@ -346,16 +403,17 @@ ggsave(paste('figures/median_monthly_rainfall_lineplot',as.character(count),'.pn
              sep=''), graphs[[count]] )
 count <- count + 1 
 }
-graphs
+panel <- ggarrange(graphs[[1]], graphs[[2]], graphs[[3]], graphs[[4]], graphs[[5]], graphs[[6]], graphs[[7]], graphs[[8]], graphs[[9]], nrow=3, ncol=3)
+panel
 ```
 
-From these results, we see that rainfall always peaks in the summer. We
-also see that states with similar annual rainfall have very similar
-monthly patterns of rainfall.
+From the above set of plots, we see that rainfall always peaks in the summer. We
+also see that states with similar amounts of annual rainfall have very similar
+monthly patterns of rainfall. This result is expected given the previous plots.
 
 The plots above hint that a greater annual rainfall is linked to a
 higher variability in rainfall. Let's explore this more systematically.
-For instance, is there a relationship between the median annual rainfall
+For instance, across all states, is there a relationship between the median annual rainfall
 and the standard deviation in annual rainfall between 1901 and 2017?
 
 ```{r}
@@ -388,11 +446,14 @@ norms
 ```
 
 Here we see that states at the high and low extremes of rainfall
-experience the most (relative) variation in rainfall.
+experience the most relative variation in rainfall. States receiving a moderate amount of rainfall are the most consistent year after year.
 
 ## Exploratory Analysis of Crop Production Data
 
-Read in crop production data. Make sure that the state and territory naming conventions match those from the rainfall data. Re-group as necessary. Note: while the rainfall data spans years 1901-2017, this crop data spans 1997-2015.
+I first read in crop production data. I make sure that the state and territory
+naming conventions match those from the rainfall data, re-grouping as
+necessary. Note: while the rainfall data spans the years 1901-2017, this
+crop data spans a much shorter timeline of 1997-2015.
 
 ```{r}
 ### Read in crops data (annual per Indian state from 1997 to 2015)
@@ -433,7 +494,8 @@ crops <- crops %>%
          dplyr::summarize(Area=sum(Area), Production=sum(Production))
 ```
 
-Let's determine which crops appear most frequently in the dataset.
+To begin, I determine which crops appear most frequently in the dataset.
+
 ```{r}
 ### Which crops appear most frequently?
 crop.counts <- crops$Crop %>% table() %>% stack() %>% rev()
@@ -441,8 +503,10 @@ crop.counts <- crop.counts[order(crop.counts$values, decreasing=T), ]
 head(crop.counts,15)
 freq.hi <- crop.counts$ind[1:50]
 ```
-Now let's see which crops are the most heavily produced over time.
-``` {r}
+
+Now I see which crops are the most heavily produced over time. As mentioned in the introduction, the units of production data are unavailable.
+
+```{r}
 ### Get total crop area and production for each state per year
 crops.area.wide <- crops[,c('State_Name','Crop_Year','Crop', 'Area')] %>% 
                        pivot_wider(names_from = Crop, values_from = Area) %>%
@@ -460,9 +524,15 @@ colnames(prod.sort) <- c('sum_production')
 head(prod.sort,15)
 prod.hi <- rownames(prod.sort)[1:50]
 ```
-Based on the result that coconut is the most produced crop, I imagine that the units of this measurement must be weight. One online source reports that 130 million tonnes of rice were produced in the year 2021-2022. This data says that the average rice production between 1997-2015 was roughly 85 million units [7]. As such, I imagine that the production unit for this data is tonnes.
 
-``` {r}
+Based on the result that coconut is the most produced crop, I imagine
+that the units of crop production must be weight or volume, not counts. One online source reports that 130 million tonnes of rice were produced in the year
+2021-2022. This data says that the average rice production between
+1997-2015 was roughly 85 million units [8]. Going forward, I will assign units of tonnes to this data.
+
+Let's see which crops cover the most area.
+
+```{r}
 ### Which crops cover the most area over time?
 area.sort <- crops.area.wide[3:126] %>%
              colSums() %>%
@@ -472,9 +542,15 @@ colnames(area.sort) <- c('sum_area')
 head(area.sort,15)
 area.hi <- rownames(area.sort)[1:50]
 ```
-We see that rice has covered the most area over time. On average 41.5 million units of rice covered India per year. One online source reports that 45 million hectares were covered in rice in the crop year 2021 [8]. I conclude that hectares must be the unit of measurement for crop production in these data.
 
-To see which states and territories are most similar in their crop production, let's run a PCA.
+We see that rice has covered the most area over time. On average, 41.5
+million units of rice covered India per year. One online source reports
+that 45 million hectares were covered in rice in the crop year 2021 [9].
+I conclude that hectares must be the unit of measurement for crop
+production in this data.
+
+To see which states and territories are most similar in their crop
+production, let's run a PCA.
 
 ```{r message=FALSE}
 ### Run a PCA on median crop production 
@@ -484,9 +560,19 @@ monthly.med <- aggregate(crops.area.wide[,common.crops], list(crops.area.wide$St
 monthly.pca <- prcomp(monthly.med, center = F,scale = F)
 ggbiplot(monthly.pca, labels=rownames(monthly.med), varname.size=1.5, labels.size=2)+ coord_equal(ratio = 0.3)
 ```
-From these results, we see that the driest states are the ones furthest from the cluster at the origin. Rice and wheat are the main crops whose production appreciably differs between states and leads to clustering. Rice and wheat are also some of the thristiest crops.
 
-## Combining Rainfall and Crop Production - Focusing on Rice and Wheat
+From these results, we see that the driest states are the ones furthest
+from the cluster at the origin. Rice and wheat are the main crops whose
+production appreciably differs between states and leads to the clustering.
+Rice and wheat are also some of the thristiest crops so this result is in line with what could be expected.
+
+## Combining Rainfall and Crop Production
+
+Let's create a plot of year vs. annual crop production and vs. median annual
+rainfall country-wide. I will focus on crops that are most highly produced, most
+widespread over India, and showing at least some variation in production over the
+years. Crops that fit this criteria are bajra, cotton, maize, potato,
+rice, soyabean, and wheat. In red is rain data.
 
 ```{r}
 ### Focus on Rice and Wheat, two very thirsty crops
@@ -496,8 +582,8 @@ focus.area <- crops.area.wide[,focus.crops]
 focus.prod <- crops.prod.wide[,focus.crops]
 focus.prod.Y <- ddply(focus.prod, "Crop_Year", numcolwise(sum))
 
-rains.Y <- rains.sum.annual %>% subset(YEAR %in% focus.prod.Y$Crop_Year)
-focus.prod.Y$Rain <- rains.Y$ANNUAL
+rains.Y <- rains.all.india %>% subset(YEAR %in% focus.prod.Y$Crop_Year)
+focus.prod.Y$Rain <- rains.Y$ANNUAL.rain*20
 
 ggplot(focus.prod.Y %>% 
          select(-Sugarcane, -Jute, -Banana, -Rain) %>% 
@@ -507,64 +593,61 @@ ggplot(focus.prod.Y %>%
   scale_x_continuous(breaks=seq(1997, 2015), guide = guide_axis(angle = 90)) +
   scale_y_continuous(
    name = "Annual Crop Production (tonnes)",
-   sec.axis = sec_axis(~ . * 1/2000, name="Median Annual Rainfall (mm)")) +
+   sec.axis = sec_axis(~ . * 1/5e4+150, name="Median Annual Rainfall")) +
   xlab('Year') +
   theme(panel.grid.minor.x = element_blank())
 ```
 
+The sharp decrease in crop production in 2015 occurs because the crop data was published partway through 2015.
 
+## Discussion
 
+The plot in section "Combining Rainfall and Crop Production" is the most telling. In red is the line representing
+my best estimate of the annual rainfall across the country. We see general patterns of crop production following rainfall - dips in rainfall generally (but not always!) correspond to dips in crop output. Drought years are 2002, 2009, and 2014. I will summarize a few observations.
 
-NEXT: create a plot of india that shows production/area of each of these
-crops
+- In 2009, relatively little rice was produced due to drought. When rainfall rebounded in 2010 however, rice production still lagged. Only in 2011 was rice output back to normal, indicating a lag period after severe drought. This was not observed with any other crop. Interestingly, in 2014, drought did not cause low rice.
 
-```{r}
+- 2009 was the first drought that did not affect wheat. Perhaps better farming practices avoided a weak wheat crop.
 
+- Potatoes appear to be relatively robust to drought. In 2002, potato was the only unaffected crop. In 2009, potato production was at an all time high. While potatoes are not known to be the most drought-tolerant, they do require less irrigation than rice and wheat.
 
+As other studies have mentioned, changing the crops sown as rainfall patterns change will allow farmers to make the most use of their land. While trends in rainfall are quite difficult to predict, a gradual shift to less thirsty crops will prove beneficial to the agriculture industry.
 
+## References:
 
+[1] Sunder, S. (2018, January 29). India economic survey 2018: Farmers
+gain as agriculture mechanisation speeds up, but more R&D needed. The
+Financial Express Stories. Retrieved August 21, 2022, from
+<https://www.financialexpress.com/budget/india-economic-survey-2018-for-farmers-agriculture-gdp-msp/1034266/>
 
-### Let's focus on crops in the top 50 most produced list and the top 50 most wide-spread list
-Reduce(intersect,  list(hi.counts, hi.prod))
+[2] Dr. Neelam Patel and Dr. Tanu Sethi. (n.d.). Rural Women: Key to New
+India's Agrarian Revolution. NITI Aayog. Retrieved August 21, 2022, from
+<https://www.niti.gov.in/rural-women-key-new-indias-agrarian-revolution>
 
+[3] Fao.org. India at a glance \| FAO in India \| Food and Agriculture
+Organization of the United Nations. (n.d.). Retrieved December 2, 2022,
+from <https://www.fao.org/india/fao-in-india/india-at-a-glance/en/>
 
-### Let's focus on the top 10 of these...
+[4] Denton, B., &; Sengupta, S. (2019, November 25). India's ominous
+future: Too little water, or far too much. The New York Times. Retrieved
+August 21, 2022
 
-crops.area.15 <- c
-crops.prod.15 <- crops.tot.prod.wide[,hi.crops]
+[5] Largest countries in the world (by area). Worldometer. (n.d.).
+Retrieved August 21, 2022, from
+<https://www.worldometers.info/geography/largest-countries-in-the-world/>
 
+[6] India cheers as monsoon arrives; hopes of better farm output raised.
+Hindustan Times. (2010, May 31). Retrieved August 21, 2022, from
+<https://www.hindustantimes.com/india/india-cheers-as-monsoon-arrives-hopes-of-better-farm-output-raised/story-Og0hZJ0ULuibRu4y7CVFpO.html>
 
+[7] Neha Madaan / TNN / Updated: Apr 15, 2022. (n.d.). Monsoon, annual rainfall in India shrank by 12mm, 16.8mm in last five decades: Pune News - Times of India. The Times of India. Retrieved December 5, 2022, from <https://timesofindia.indiatimes.com/city/pune/monsoon-annual-rainfall-in-india-shrank-by-12mm-16-8mm-in-last-four-decades/articleshow/90855547.cms>
 
+[8] Pti. (2022, September 9). Government says India's rice production
+may fall by 10-12 million tonnes in Kharif season this year. Return to
+frontpage. Retrieved December 2, 2022, from
+<https://www.thehindu.com/news/national/government-says-indias-rice-production-may-fall-by-10-12-million-tonnes-in-kharif-season-this-year/article65869909.ece>
 
-
-
-
-### Combine crops that appear less than 500 times as "other"
-other <- crop.counts$ind[crop.counts$values<500]
-crops.tot.area.wide$other <- rowSums(crops.tot.area.wide[,other])
-crops.tot.prod.wide$other <- rowSums(crops.tot.prod.wide[,other])
-crops.tot.area.wide <- crops.tot.area.wide %>% select(-one_of(other))
-crops.tot.prod.wide <- crops.tot.prod.wide %>% select(-one_of(other))
-dim(crops.tot.prod.wide)
-
-
-    
-  df %>% group_by(x) %>% summarise(y = sum(y))
-  
-         group_by(State_Name, Crop_Year, Crop) %>%
-         summarise(n = dplyr::n(), .groups = "drop") %>%
-         filter(n > 1L) %>%
-
-  a<-crops %>% pivot_wider(names_from = Crop, values_from = Area)
-
-crops <- crops %>% mutate(Crop = replace(Crop,Crop %in% other,"other"))
-a <- crops %>% pivot_wider(names_from = Crop, values_from = Area)
-
-
-
-%>% filter(Crop %in% other)
-
-tail(crop.counts)
-hist(log(crop.counts$values), breaks=100)
-
-```
+[9] Published by Statista Research Department, (2022, March 16). India:
+Area of cultivation for rice 2021. Statista. Retrieved December 2, 2022,
+from
+<https://www.statista.com/statistics/765691/india-area-of-cultivation-for-rice/>
