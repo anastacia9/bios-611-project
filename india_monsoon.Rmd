@@ -80,8 +80,12 @@ library(htmlwidgets)
 library(viridis)
 library(tidyr)
 library(plyr)
+remotes::install_github("vqv/ggbiplot", force=T)
+devtools::install_github("kassambara/ggpubr")
 library(ggbiplot)
+update.packages("tidyr")
 library(ggpubr)
+library(tidyr)
 ```
 
 ## Exploratory Analysis of Rainfall Data
